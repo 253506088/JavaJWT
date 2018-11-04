@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration  
+	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+	
+<configuration>
+	
+	<!-- Spring配置了数据源和mapper映射，因此Mybatis的配置文件就不需要这两个东西的配置 -->
+	
+	<!-- settings里可是设置多个setting -->
+	<settings>
+		<!-- 配置mybatis的log实现为LOG4J -->
+		<setting name="logImpl" value="LOG4J" />
+	</settings>
+</configuration>

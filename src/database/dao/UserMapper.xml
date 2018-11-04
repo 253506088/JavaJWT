@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 关于user表的Mapper文件 -->
+<mapper namespace="database.dao.UserMapper">
+	
+	<!-- 根据昵称获取id，用于判断该昵称是否存在，存在则返回userId -->
+	<select id="getUserIdByNikeName" resultType="Integer">
+		select `userId` from `user` where `nikeName` = #{nikeName}
+	</select>
+	
+	<!-- 根据账号获取id，用于判断该账号是否存在，存在则返回userId -->
+	<select id="getUserIdByUsername" resultType="Integer">
+		select `userId` from `user` where `username` = #{username} and `activation` = 1
+	</select>
+	
+	<!-- 根据邮箱获取id，用于判断该账号是否存在，存在则返回userId -->
+	<select id="getUserIdByEmail" resultType="Integer">
+		select `userId` from `user` where `email` = #{email} and `activation` = 1
+	</select>
+	
+	<!-- 根据邮箱、创建时间、修改时间获取id，用于获取用邮箱注册的用户信息 -->
+	<select id="getUserByEmailAndTime" resultType="database.pojo.User">
+		select * from `user` where `email` = #{email} and `gmtCreate` = #{gmtCreate}
+		and `gmtModified` = #{gmtModified}
+	</select>
+	
+	<!-- 根据账号与密码查询用户 -->
+	<select id="loginUsername" resultType="database.pojo.User">
+		select * from `user` where `username` = #{username} and `password` = #{password} and `activation` = 1
+	</select>
+	
+	<!-- 根据邮箱与密码查询用户 -->
+	<select id="loginEmail" resultType="database.pojo.User">
+		select * from `user` where `email` = #{email} and `password` = #{password} and `activation` = 1
+	</select>
+	
+	<!-- 根据id查询用户 -->
+	<select id="getUserById" resultType="database.pojo.User">
+		select * from `user` where `userId` = #{userId}
+	</select>
+	
+	<!-- 新增用户 -->
+    <insert id="addUser" parameterType="database.pojo.User">
+         insert into user(`username`,`password`,`nikeName`,`email`,`gmtCreate`,`gmtModified`,`activation`) 
+         	values(#{username},#{password},#{nikeName},#{email},#{gmtCreate},#{gmtModified},#{activation})
+    </insert>
+    
+    <!-- 根据id修改用户是否激活 -->
+    <update id="modifyActivationById" parameterType="Integer">
+    	UPDATE `user` SET `activation` = #{activation} WHERE `userId` = #{userId}
+    </update>
+    
+    <!-- 根据id修改用户是否激活 -->
+    <update id="modifyIsDeleteById" parameterType="Integer">
+    	UPDATE `user` SET `isDelete` = #{isDelete} WHERE `userId` = #{userId}
+    </update>
+</mapper>
+
+

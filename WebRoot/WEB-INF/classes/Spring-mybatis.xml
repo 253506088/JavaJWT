@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 配置Mybatis的部分 -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns:aop="http://www.springframework.org/schema/aop"
+     xmlns:tx="http://www.springframework.org/schema/tx"
+     xmlns:context="http://www.springframework.org/schema/context"
+     xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/aop
+         http://www.springframework.org/schema/aop/spring-aop.xsd
+         http://www.springframework.org/schema/tx
+         http://www.springframework.org/schema/tx/spring-tx.xsd 
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd">	               	
+
+   		<!-- 读取数据库配置文件 -->
+   		<context:property-placeholder location="classpath:database.properties"/>
+   		
+ 		<!-- 用JNDI获取数据源(使用dbcp连接池) -->  
+	    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" scope="singleton">
+    		<property name="driverClassName" value="${driver}" />  
+			<property name="url" value="${url}" />  
+			<property name="username" value="${user}" />  
+			<property name="password" value="${password}" />
+	    </bean>
+   		
+   		<!-- 配置SqlSeesionFactiryBean,Mybatis里全部的配置都是在这里进行的 -->
+   		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+   			<!-- 引用数据源 -->
+   			<property name="dataSource" ref="dataSource"></property>
+   			<!-- mapperLocations相当于mappers，用于引入mapper映射文件的 -->
+   			<property name="mapperLocations">
+				<!-- 指定Mapper映射文件 -->
+  				<list>
+  					<value>classpath:database/dao*.xml</value>
+  				</list>
+   			</property>
+  
+   			<!-- configLocation可以引用MyBatis的配置文件，但是这里配置了数据源和
+   				mapper映射，因此Mybatis的配置文件就不需要这两个东西的配置 -->
+   			<!-- 格式为		classpath:mybatis配置文件名称 -->
+   			<property name="configLocation" value="classpath:mybatis_config.xml"></property>
+   		</bean>
+   		
+   		<!-- 配置SqlSessionTemplate -->
+   		<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+   			<!-- 用构造注入来构造 -->
+   			<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+   		</bean>
+   		
+   		<!-- 将指定包下的Mapper接口注册为Bean,这个不需要Id -->
+   		<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+   			<!-- 可以指定包名也可以用通配符 -->
+   			<property name="basePackage" value="database.dao"></property>
+   		</bean>
+   		
+   	
+		 
+		
+		<!-- 扫描指定包下所有文件（包含每一级子文件夹）中除了@Controller以外的所有注解 -->
+		<context:component-scan base-package="controller" use-default-filters="true">
+		  <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		</context:component-scan>
+
+		<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+			<!-- 指定数据源 -->
+		    <property name="dataSource" ref="dataSource"/>
+		</bean>
+		
+		<!-- 使用annotation注解方式配置事务 -->
+		<tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>
+
+
+
+
+
+
